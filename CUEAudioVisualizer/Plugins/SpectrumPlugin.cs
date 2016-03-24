@@ -25,7 +25,40 @@ namespace CUEAudioVisualizer.Plugins
                 new VisualizerModes("Spectrum (Rainbow Foreground)", SpectrumRainbowForegroundDelegate),
             new VisualizerModes("Spectrum (Rainbow Background)", SpectrumRainbowBackgroundDelegate)};
         }
-
+        
+        private Color HSVToColor(double hue, double saturation, double value){
+            int hi = Convert.ToInt32(Math.Floor(hue/60))%6;
+            double f = hue/60-Math.Floor(hue/60);
+            value = value*255;
+            int v = Convert.ToInt32(value);
+            int p = Convert.ToInt32(value*(1-saturation));
+            int q = Convert.ToInt32(value*(1-f*saturation));
+            int t = Convert.ToInt32(value*(1-(1-f)*saturation));
+            switch(hi){
+                case 0:
+                    return Color.FromArgb(255, v, t, p);
+                case 1:
+                    return Color.FromArgb(255, q, v, p);
+                case 2:
+                    return Color.FromArgb(255, p, v, t);
+                case 3:
+                    return Color.FromArgb(255, p, q, v);
+                case 4:
+                    return Color.FromArgb(255, t, p, v);
+                default:
+                    return Color.FromArgb(255, v, p, q);
+            }
+        }
+        
+        private double map(double value, double fromSource, double toSource, double fromTarget, double toTarget){
+            return (value-fromSource)/(toSource-fromSource)*(toTarget-fromTarget)+fromTarget;
+        }
+        
+        private void SpectrumUPdateDelegateHSV(){
+            Host.Keyboard.Color = Color.Black;
+            float kbWidth = Host.Keyboard.KeyboardRectangle.Location.X+Host.Keyboard.Width;
+        }
+        
         //Updates the keyboard using the Spectrum Visualizer
         private void SpectrumUpdateDelegate()
         {
